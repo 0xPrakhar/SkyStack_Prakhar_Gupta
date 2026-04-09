@@ -1,81 +1,93 @@
-🏆 Kalpathon Hackathon Submission
+<<<<<<< HEAD
+<<<<<<< HEAD
+# Eventify
 
-👥 Team Details
+Eventify is a React + Vite frontend with a Node.js + Express backend for browsing events and handling basic user authentication.
 
-Team Name: SkyStack_Prakhar_Gupta
+## Stack
 
-Team Leader: Prakhar Gupta
+- Frontend: React, Vite
+- Backend: Node.js, Express
+- Auth: JWT, bcryptjs
+- Validation: Zod
+- Deployment: Render
 
-📞 Phone: 7860678864
+## Project Structure
 
-👨‍💻 Team Members & Roles
+```text
+app/
+├─ src/                  Frontend source
+├─ server/               Backend source
+├─ render.yaml           Render blueprint
+├─ package.json          Frontend package manifest
+└─ README.md
+```
 
-Aman Yadav – Frontend Developer ⚛️
+## Local Setup
 
-Aditya Singh – UI/UX Designer 🎨
+### Frontend
 
-Vinayak Chauhan – Deployer & Presenter 🚀
+```powershell
+cd C:\Users\adi\Documents\figma\app
+npm install
+npm run dev
+```
 
-💡 Project Details
+### Backend
 
-Project Name: Event Hub 🎟️
+```powershell
+cd C:\Users\adi\Documents\figma\app\server
+Copy-Item .env.example .env
+npm install
+npm start
+```
 
-Selected Track: Web 🌐
+### Local URLs
 
-Problem Statement: Hyper-Local Event Ticketing Web App
+- Frontend: `http://127.0.0.1:5173`
+- Backend: `http://127.0.0.1:5000`
+- Health check: `http://127.0.0.1:5000/api/health`
 
-📌 Problem Statement
+## Default Admin Login
 
-Develop a web platform for finding, booking tickets to, and managing attendance at nearby college fests 🎉, pop-ups 🛍️, and community events 🏘️.
+- Email: `admin@eventify.local`
+- Password: `Admin@12345`
 
-🚀 Project Description
+## Deploy To Render
 
-Event Hub is a full-stack event management web application 🎟️ designed to simplify the process of organizing, managing, and participating in events. It provides a smooth and intuitive experience for both users 👤 and event organizers 📅 through a modern and responsive interface.
+This repo already includes [render.yaml](./render.yaml).
 
-Built using a powerful tech stack 💻 with React (Vite) ⚛️ on the frontend and Node.js 🚀 on the backend, the application ensures high performance and scalability. Users can explore events 🔍, view detailed information 📄, and manage their tickets 🎫, while organizers can create, update, and manage events using a dedicated dashboard 📊.
+### Steps
 
-To ensure portability and seamless deployment 🌐, the project is containerized using Docker 🐳 and deployed on the cloud using Render ☁️.
+1. Push this project to GitHub.
+2. In Render, choose `New +` -> `Blueprint`.
+3. Connect the GitHub repo.
+4. Render will create:
+   - `eventify-api` as the backend service
+   - `eventify-web` as the static frontend
+5. Deploy.
 
-🔥 Key Features
+## Environment
 
-🧩 Must-Have Features (MVP)
+Use [server/.env.example](./server/.env.example) as the backend template.
 
-👤 User Authentication
+Frontend production API calls use `VITE_API_URL`.
+=======
+=======
+>>>>>>> e91372e (initial commit)
 
-Secure signup and login system using JWT-based authentication.
+  # Untitled
 
-📅 Event Listing
+  This is a code bundle for Untitled. The original project is available at https://www.figma.com/design/2CcIL8wS6de4WZx9fln0R5/Untitled.
 
-Browse events with details like name, date, time, venue, and available tickets.
+  ## Running the code
 
-🎟️ Ticket Booking
+  Run `npm i` to install the dependencies.
 
-Users can book tickets with real-time updates on availability.
-
-✅ Booking Confirmation
-
-Instant confirmation after booking with success message (QR support 🚀).
-
-✅ Nice-to-Have Features
-
-🛠️ Admin Panel – Manage events & track attendees
-
-🔍 Search & Category Filters – Easy event discovery
-
-🎫 Ticket Limits per User – Fair usage system
-
-🎨 Responsive UI – Clean and mobile-friendly design
-
-💎 Extra “Wow” Features
-
-📩 Email/SMS confirmation
-
-📢 Social sharing
-
-📊 Admin analytics dashboard
-
-⏳ Live event countdown timer
-
-🔗 Additional Links
-
-📊 Presentation: [Add Link Here]
+  Run `npm run dev` to start the development server.
+<<<<<<< HEAD
+  
+>>>>>>> e91372e (initial commit)
+=======
+  
+>>>>>>> e91372e (initial commit)
