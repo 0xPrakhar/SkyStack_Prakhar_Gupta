@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 export const CITIES = [
   "New Delhi",
   "Mumbai",
@@ -194,26 +192,3 @@ export const EVENTS = [
     lng: 77.6083,
   },
 ];
-=======
-=======
->>>>>>> e91372e (initial commit)
-import { INDIA_CITY_LOCATIONS } from "./lib/india-locations";
-
-export const CITIES = INDIA_CITY_LOCATIONS.map((location) => location.city);
-
-export const CATEGORIES = [
-  { id: "all", name: "All Events", icon: "*" },
-  { id: "college", name: "College Events", icon: "U" },
-  { id: "concerts", name: "Concerts", icon: "M" },
-  { id: "tech", name: "Tech & Hackathons", icon: "T" },
-  { id: "workshops", name: "Workshops", icon: "W" },
-  { id: "sports", name: "Sports", icon: "S" },
-  { id: "comedy", name: "Comedy", icon: "J" },
-  { id: "cultural", name: "Cultural", icon: "A" },
-  { id: "business", name: "Business", icon: "B" },
-  { id: "exhibitions", name: "Exhibitions", icon: "E" },
-];
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)

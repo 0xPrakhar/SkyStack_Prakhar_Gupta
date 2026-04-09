@@ -1,116 +1,14 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { motion } from "motion/react";
 import { Ticket, Mail, Lock, ArrowRight } from "lucide-react";
-import { useState, type FormEvent } from "react";
-import { useAuth } from "../context/AuthContext";
-import { getErrorMessage } from "../lib/api";
 
 export function SignIn() {
-  const navigate = useNavigate();
-  const { signIn } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-    setIsSubmitting(true);
-
-    try {
-      const user = await signIn({ email, password });
-      navigate(user.role === "admin" ? "/admin" : "/");
-    } catch (submitError) {
-      setError(getErrorMessage(submitError, "Unable to sign you in right now."));
-    } finally {
-      setIsSubmitting(false);
-=======
-=======
->>>>>>> e91372e (initial commit)
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useLocation, useNavigate } from "react-router";
-import { motion } from "motion/react";
-import { Ticket, Mail, Lock, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
-import { useAuth } from "../context/AuthContext";
-import { getApiError } from "../lib/api";
-
-const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(8, "Password must be at least 8 characters long."),
-});
-
-type SignInFormValues = z.infer<typeof signInSchema>;
-
-export function SignIn() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated, isBootstrapping, signIn, user } = useAuth();
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<SignInFormValues>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  useEffect(() => {
-    if (isBootstrapping || !isAuthenticated || !user) {
-      return;
-    }
-
-    navigate(user.role === "admin" ? "/admin" : "/", { replace: true });
-  }, [isAuthenticated, isBootstrapping, navigate, user]);
-
-  async function onSubmit(values: SignInFormValues) {
-    try {
-      const signedInUser = await signIn(values);
-      const redirect = new URLSearchParams(location.search).get("redirect");
-
-      toast.success(`Welcome back, ${signedInUser.name}.`);
-      navigate(redirect || (signedInUser.role === "admin" ? "/admin" : "/"), {
-        replace: true,
-      });
-    } catch (error) {
-      setError("root", {
-        message: getApiError(error, "Unable to sign you in right now."),
-      });
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
-    }
-  }
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-black px-4">
-<<<<<<< HEAD
-<<<<<<< HEAD
       {/* Background grain/texture */}
       <div className="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       <motion.div 
-=======
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <motion.div
->>>>>>> e91372e (initial commit)
-=======
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <motion.div
->>>>>>> e91372e (initial commit)
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -126,20 +24,16 @@ export function SignIn() {
         </Link>
 
         <div className="text-center mb-8">
-<<<<<<< HEAD
-<<<<<<< HEAD
           <h1 className="text-2xl font-bold text-white mb-2 uppercase">Welcome Back</h1>
           <p className="text-sm text-slate-400 font-medium">Sign in to book your next experience</p>
         </div>
 
-        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+        <form className="w-full flex flex-col gap-4" onSubmit={e => e.preventDefault()}>
           
           <div className="relative group">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="email" 
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
               placeholder="Email address" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
@@ -149,25 +43,17 @@ export function SignIn() {
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="password" 
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
               placeholder="Password" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
           </div>
 
-          {error && (
-            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-              {error}
-            </div>
-          )}
-
           <div className="flex justify-end mb-2">
             <a href="#" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Forgot password?</a>
           </div>
 
-          <button disabled={isSubmitting} className="w-full group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden disabled:opacity-70 disabled:hover:translate-y-0">
-            <span className="relative z-10">{isSubmitting ? "Signing in..." : "Sign In"}</span>
+          <button className="w-full group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden">
+            <span className="relative z-10">Sign In</span>
             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
           </button>
           
@@ -193,69 +79,6 @@ export function SignIn() {
           Don't have an account? <Link to="/signup" className="text-white font-bold hover:underline">Sign Up</Link>
         </p>
 
-=======
-=======
->>>>>>> e91372e (initial commit)
-          <h1 className="text-2xl font-bold text-white mb-2 uppercase">
-            Welcome Back
-          </h1>
-          <p className="text-sm text-slate-400 font-medium">
-            Sign in to book, save, and manage your events.
-          </p>
-        </div>
-
-        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
-            <input
-              {...register("email")}
-              type="email"
-              placeholder="Email address"
-              className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
-            />
-          </div>
-          {errors.email && <p className="text-sm text-red-400 -mt-2">{errors.email.message}</p>}
-
-          <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
-            <input
-              {...register("password")}
-              type="password"
-              placeholder="Password"
-              className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
-            />
-          </div>
-          {errors.password && (
-            <p className="text-sm text-red-400 -mt-2">{errors.password.message}</p>
-          )}
-
-          {errors.root && (
-            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-              {errors.root.message}
-            </div>
-          )}
-
-          <button
-            disabled={isSubmitting}
-            className="w-full group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-          >
-            <span className="relative z-10">
-              {isSubmitting ? "Signing in..." : "Sign In"}
-            </span>
-            <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </form>
-
-        <p className="mt-8 text-sm text-slate-400 font-medium">
-          Don&apos;t have an account?{" "}
-          <Link to="/signup" className="text-white font-bold hover:underline">
-            Create one
-          </Link>
-        </p>
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
       </motion.div>
     </div>
   );
