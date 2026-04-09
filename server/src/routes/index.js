@@ -7,15 +7,7 @@ import eventRoutes from "./events.routes.js";
 const router = Router();
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-<<<<<<< HEAD
-<<<<<<< HEAD
   max: 25,
-=======
-  max: 20,
->>>>>>> e91372e (initial commit)
-=======
-  max: 20,
->>>>>>> e91372e (initial commit)
   standardHeaders: true,
   legacyHeaders: false,
   message: {

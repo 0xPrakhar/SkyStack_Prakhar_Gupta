@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-import bcrypt from "bcryptjs";
-import { mkdir, readFile, writeFile } from "fs/promises";
-import path from "path";
-import { env } from "../config/env.js";
-import { buildSeedStore } from "../constants/seed-data.js";
-
-let cachedStore = null;
-
-async function ensureStoreFile() {
-=======
-=======
->>>>>>> e91372e (initial commit)
 import { mkdir, readFile, rename, writeFile } from "fs/promises";
 import path from "path";
 import { env } from "../config/env.js";
@@ -115,36 +101,16 @@ function mergeSeedEvents(store) {
 }
 
 export async function initializeDataStore() {
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
   const directory = path.dirname(env.storageFilePath);
   await mkdir(directory, { recursive: true });
 
   try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    await readFile(env.storageFilePath, "utf8");
-=======
     await readFile(env.storageFilePath, "utf-8");
->>>>>>> e91372e (initial commit)
-=======
-    await readFile(env.storageFilePath, "utf-8");
->>>>>>> e91372e (initial commit)
   } catch (error) {
     if (error.code !== "ENOENT") {
       throw error;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    const defaultAdminPasswordHash = await bcrypt.hash(env.defaultAdminPassword, 12);
-    const store = buildSeedStore(env.defaultAdminEmail, defaultAdminPasswordHash);
-    await writeFile(env.storageFilePath, JSON.stringify(store, null, 2), "utf8");
-=======
-=======
->>>>>>> e91372e (initial commit)
     await writeFile(
       env.storageFilePath,
       JSON.stringify(buildSeedStore(), null, 2),
@@ -162,33 +128,10 @@ export async function initializeDataStore() {
       JSON.stringify(mergedStoreResult.store, null, 2),
       "utf-8",
     );
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
   }
 }
 
 export async function readStore() {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  await ensureStoreFile();
-
-  if (cachedStore) {
-    return structuredClone(cachedStore);
-  }
-
-  const raw = await readFile(env.storageFilePath, "utf8");
-  cachedStore = JSON.parse(raw);
-  return structuredClone(cachedStore);
-}
-
-export async function writeStore(store) {
-  cachedStore = structuredClone(store);
-  await writeFile(env.storageFilePath, JSON.stringify(store, null, 2), "utf8");
-=======
-=======
->>>>>>> e91372e (initial commit)
   await initializeDataStore();
   const rawStore = await readFile(env.storageFilePath, "utf-8");
 
@@ -222,8 +165,4 @@ export function updateStore(updater) {
   );
 
   return queuedUpdate;
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
 }

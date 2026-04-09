@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-export function errorHandler(error, req, res, _next) {
-=======
-=======
->>>>>>> e91372e (initial commit)
 import { ZodError } from "zod";
 
 export function errorHandler(error, req, res, _next) {
@@ -21,10 +15,6 @@ export function errorHandler(error, req, res, _next) {
     return;
   }
 
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
   const statusCode = error.statusCode ?? 500;
   const message =
     statusCode >= 500 ? "Something went wrong on the server." : error.message;

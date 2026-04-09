@@ -1,11 +1,4 @@
 import { Router } from "express";
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { asyncHandler } from "../utils/async-handler.js";
-import { readStore } from "../services/data-store.js";
-=======
-=======
->>>>>>> e91372e (initial commit)
 import { authenticate } from "../middlewares/auth.js";
 import { validateBody } from "../middlewares/validate.js";
 import {
@@ -18,23 +11,11 @@ import {
 } from "../services/events.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { eventRatingSchema, eventSchema } from "../validators/event.schemas.js";
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
 
 const router = Router();
 
 router.get(
   "/",
-<<<<<<< HEAD
-<<<<<<< HEAD
-  asyncHandler(async (_req, res) => {
-    const store = await readStore();
-    res.status(200).json({ success: true, data: { events: store.events } });
-=======
-=======
->>>>>>> e91372e (initial commit)
   asyncHandler(async (req, res) => {
     const events = await listEvents(req.query);
 
@@ -122,10 +103,6 @@ router.post(
         event,
       },
     });
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
   }),
 );
 

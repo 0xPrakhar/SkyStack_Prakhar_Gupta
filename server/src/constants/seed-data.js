@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-export const seedEvents = [
-  {
-    id: "1",
-=======
-=======
->>>>>>> e91372e (initial commit)
 function buildSeedRating(userId, userName, rating, comment, createdAt) {
   return {
     id: `rating-${userId}`,
@@ -155,10 +147,6 @@ export const seedEvents = [
   },
   {
     id: "evt-neon-nights",
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
     title: "Neon Nights Music Festival",
     categoryId: "concerts",
     categoryName: "Concerts",
@@ -175,15 +163,7 @@ export const seedEvents = [
     lng: 77.2343,
   },
   {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    id: "2",
-=======
     id: "evt-global-hackathon",
->>>>>>> e91372e (initial commit)
-=======
-    id: "evt-global-hackathon",
->>>>>>> e91372e (initial commit)
     title: "Global Tech Hackathon '26",
     categoryId: "tech",
     categoryName: "Tech & Hackathons",
@@ -200,15 +180,7 @@ export const seedEvents = [
     lng: 77.4646,
   },
   {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    id: "3",
-=======
     id: "evt-laugh-riot",
->>>>>>> e91372e (initial commit)
-=======
-    id: "evt-laugh-riot",
->>>>>>> e91372e (initial commit)
     title: "Laugh Riot Standup Tour",
     categoryId: "comedy",
     categoryName: "Comedy",
@@ -224,28 +196,6 @@ export const seedEvents = [
     lat: 18.9256,
     lng: 72.8242,
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
-];
-
-export function buildSeedStore(defaultAdminEmail, defaultAdminPasswordHash) {
-  const timestamp = new Date().toISOString();
-
-  return {
-    users: [
-      {
-        id: "admin-user",
-        name: "Eventify Admin",
-        email: defaultAdminEmail,
-        passwordHash: defaultAdminPasswordHash,
-        role: "admin",
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-    ],
-=======
-=======
->>>>>>> e91372e (initial commit)
   {
     id: "evt-oasis-fest",
     title: "Oasis Cultural Fest",
@@ -375,27 +325,14 @@ export function buildSeedStore() {
 
   return {
     users: [],
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
     events: seedEvents.map((event) => ({
       ...event,
       createdAt: timestamp,
       updatedAt: timestamp,
     })),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> e91372e (initial commit)
     meta: {
       initializedAt: timestamp,
       version: 4,
     },
-<<<<<<< HEAD
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)
   };
 }
