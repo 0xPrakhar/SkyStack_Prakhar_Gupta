@@ -7,11 +7,9 @@ let pool;
 
 export async function connectDatabase() {
   if (!env.databaseUrl) {
-    if (env.isProduction) {
-      throw new Error("DATABASE_URL is required in production.");
-    }
-
-    console.warn("DATABASE_URL is not set. Skipping PostgreSQL connection in development.");
+    console.warn(
+      "DATABASE_URL is not set. Skipping PostgreSQL connection and using the file-backed store.",
+    );
     return null;
   }
 
