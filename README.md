@@ -18,9 +18,9 @@ Vinayak Chauhan – Deployer & Presenter 🚀
 
 💡 Project Details
 
-Project Name: Eventify 🎟️
+Project Name: Event Hub 🎟️
 
-Selected Track: Web3 🌐
+Selected Track: Web 🌐
 
 Problem Statement: Hyper-Local Event Ticketing Web App
 
@@ -30,7 +30,7 @@ Develop a web platform for finding, booking tickets to, and managing attendance 
 
 🚀 Project Description
 
-Eventify is a full-stack event management web application 🎟️ designed to simplify the process of organizing, managing, and participating in events. It provides a smooth and intuitive experience for both users 👤 and event organizers 📅 through a modern and responsive interface.
+Event Hub is a full-stack event management web application 🎟️ designed to simplify the process of organizing, managing, and participating in events. It provides a smooth and intuitive experience for both users 👤 and event organizers 📅 through a modern and responsive interface.
 
 Built using a powerful tech stack 💻 with React (Vite) ⚛️ on the frontend and Node.js 🚀 on the backend, the application ensures high performance and scalability. Users can explore events 🔍, view detailed information 📄, and manage their tickets 🎫, while organizers can create, update, and manage events using a dedicated dashboard 📊.
 
