@@ -1,8 +1,33 @@
-import { Link } from "react-router";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Ticket, Mail, Lock, ArrowRight } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { getApiError } from "../lib/api";
 
 export function SignIn() {
+  const navigate = useNavigate();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const user = await signIn({ email, password });
+      navigate(user.role === "admin" ? "/admin" : "/");
+    } catch (submitError) {
+      setError(getApiError(submitError, "Unable to sign in right now."));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-black px-4">
       {/* Background grain/texture */}
@@ -28,12 +53,14 @@ export function SignIn() {
           <p className="text-sm text-slate-400 font-medium">Sign in to book your next experience</p>
         </div>
 
-        <form className="w-full flex flex-col gap-4" onSubmit={e => e.preventDefault()}>
+        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
           
           <div className="relative group">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="email" 
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               placeholder="Email address" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
@@ -43,17 +70,28 @@ export function SignIn() {
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="password" 
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               placeholder="Password" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
           </div>
 
+          {error && (
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {error}
+            </div>
+          )}
+
           <div className="flex justify-end mb-2">
             <a href="#" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Forgot password?</a>
           </div>
 
-          <button className="w-full group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden">
-            <span className="relative z-10">Sign In</span>
+          <button
+            disabled={isSubmitting}
+            className="w-full group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden disabled:opacity-70 disabled:hover:translate-y-0"
+          >
+            <span className="relative z-10">{isSubmitting ? "Signing in..." : "Sign In"}</span>
             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
           </button>
           

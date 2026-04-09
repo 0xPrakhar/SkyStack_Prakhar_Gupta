@@ -1,8 +1,34 @@
-import { Link } from "react-router";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Ticket, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { getApiError } from "../lib/api";
 
 export function SignUp() {
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      await signUp({ name, email, password });
+      navigate("/");
+    } catch (submitError) {
+      setError(getApiError(submitError, "Unable to create your account right now."));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-black px-4">
       <div className="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
@@ -27,12 +53,14 @@ export function SignUp() {
           <p className="text-sm text-slate-400 font-medium">Join the ultimate event experience</p>
         </div>
 
-        <form className="w-full flex flex-col gap-4" onSubmit={e => e.preventDefault()}>
+        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
           
           <div className="relative group">
             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="text" 
+              value={name}
+              onChange={(event) => setName(event.target.value)}
               placeholder="Full Name" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
@@ -42,6 +70,8 @@ export function SignUp() {
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="email" 
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               placeholder="Email address" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
@@ -51,13 +81,24 @@ export function SignUp() {
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-white transition-colors" />
             <input 
               type="password" 
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               placeholder="Password" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
           </div>
 
-          <button className="w-full mt-4 group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden">
-            <span className="relative z-10">Sign Up</span>
+          {error && (
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {error}
+            </div>
+          )}
+
+          <button
+            disabled={isSubmitting}
+            className="w-full mt-4 group relative flex items-center justify-center gap-2 py-4 bg-white rounded-2xl text-black font-black uppercase tracking-widest hover:bg-slate-200 transition-all transform hover:-translate-y-1 overflow-hidden disabled:opacity-70 disabled:hover:translate-y-0"
+          >
+            <span className="relative z-10">{isSubmitting ? "Creating account..." : "Sign Up"}</span>
             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
           </button>
           
