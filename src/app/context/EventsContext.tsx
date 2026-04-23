@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import api from "../lib/api";
 import type {
   ApiEnvelope,
+  EventFilters,
   EventPayload,
   EventRecord,
 } from "../types";
@@ -17,6 +18,7 @@ interface EventsContextValue {
   featuredEvents: EventRecord[];
   isLoading: boolean;
   error: string | null;
+  fetchEvents: (filters?: EventFilters) => Promise<EventRecord[]>;
   refreshEvents: () => Promise<void>;
   createEvent: (payload: EventPayload) => Promise<EventRecord>;
   updateEvent: (eventId: string, payload: EventPayload) => Promise<EventRecord>;
@@ -48,14 +50,22 @@ export function EventsProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
 
     try {
-      const response = await api.get<ApiEnvelope<{ events: EventRecord[] }>>("/events");
-      setEvents(response.data.data.events);
+      const loadedEvents = await fetchEvents();
+      setEvents(loadedEvents);
       setError(null);
     } catch (_error) {
       setError("Unable to load events right now.");
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function fetchEvents(filters?: EventFilters) {
+    const response = await api.get<ApiEnvelope<{ events: EventRecord[] }>>("/events", {
+      params: filters,
+    });
+
+    return response.data.data.events;
   }
 
   async function createEvent(payload: EventPayload) {
@@ -112,6 +122,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
         featuredEvents: featuredEvents.length > 0 ? featuredEvents : events.slice(0, 3),
         isLoading,
         error,
+        fetchEvents,
         refreshEvents,
         createEvent,
         updateEvent,

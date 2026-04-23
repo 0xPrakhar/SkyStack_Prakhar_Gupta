@@ -1,8 +1,11 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import { env } from "../config/env.js";
+import adminRoutes from "./admin.routes.js";
 import authRoutes from "./auth.routes.js";
+import bookingRoutes from "./bookings.routes.js";
 import eventRoutes from "./events.routes.js";
+import openRoutes from "./open.routes.js";
 
 const router = Router();
 const authLimiter = rateLimit({
@@ -22,12 +25,15 @@ router.get("/health", (_req, res) => {
     message: "API is running.",
     environment: env.nodeEnv,
     databaseConfigured: Boolean(env.databaseUrl),
-    storageFilePath: env.storageFilePath,
+    storageMode: env.databaseUrl ? "postgres" : "file",
     timestamp: new Date().toISOString(),
   });
 });
 
 router.use("/auth", authLimiter, authRoutes);
+router.use("/admin", adminRoutes);
+router.use("/bookings", bookingRoutes);
 router.use("/events", eventRoutes);
+router.use("/open", openRoutes);
 
 export default router;

@@ -1,6 +1,7 @@
 import { Link } from "react-router";
-import { MapPin, Calendar } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import { motion } from "motion/react";
+import { formatPrice } from "../lib/formatters";
 
 interface EventCardProps {
   id: string;
@@ -15,61 +16,68 @@ interface EventCardProps {
   image: string;
 }
 
-export function EventCard({ id, title, categoryName, date, time, city, venue, price, image }: EventCardProps) {
+export function EventCard({
+  id,
+  title,
+  categoryName,
+  date,
+  time,
+  city,
+  venue,
+  price,
+  image,
+}: EventCardProps) {
   return (
-    <motion.div 
+    <motion.div
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="group flex flex-col bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden hover:border-white/30 transition-all duration-300"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition-all duration-300 hover:border-white/30"
     >
-      {/* Image Thumbnail */}
-      <div className="relative h-48 w-full overflow-hidden grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500">
-        <img 
-          src={image} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+      <div className="relative h-48 w-full overflow-hidden grayscale-[0.2] transition-all duration-500 group-hover:grayscale-0">
+        <img
+          src={image}
+          alt={title}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        {/* Gradients Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
-        
-        {/* Category Badge */}
-        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full flex items-center gap-1.5">
-          <span className="text-xs font-semibold tracking-wide uppercase text-white">
+
+        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-3 py-1 backdrop-blur-md">
+          <span className="text-xs font-semibold uppercase tracking-wide text-white">
             {categoryName}
           </span>
         </div>
-        
-        {/* Price Tag */}
-        <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full">
-          <span className="text-sm font-bold text-black">
-            {price === 0 ? "FREE" : `₹${price}`}
-          </span>
+
+        <div className="absolute right-3 top-3 rounded-full bg-white px-3 py-1">
+          <span className="text-sm font-bold text-black">{formatPrice(price)}</span>
         </div>
       </div>
 
-      {/* Content Body */}
-      <div className="p-5 flex flex-col flex-1 gap-4">
+      <div className="flex flex-1 flex-col gap-4 p-5">
         <div>
-          <h3 className="text-xl font-bold leading-tight mb-2 text-white group-hover:text-slate-300 transition-colors line-clamp-2">
+          <h3 className="mb-2 line-clamp-2 text-xl font-bold leading-tight text-white transition-colors group-hover:text-slate-300">
             {title}
           </h3>
           <div className="flex flex-col gap-1.5 text-sm text-slate-400">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-slate-500" />
-              <span>{date} • {time}</span>
+              <Calendar className="h-4 w-4 text-slate-500" />
+              <span>
+                {date} • {time}
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-slate-500" />
-              <span className="truncate">{venue}, {city}</span>
+              <MapPin className="h-4 w-4 text-slate-500" />
+              <span className="truncate">
+                {venue}, {city}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
-          <Link 
+        <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-4">
+          <Link
             to={`/event/${id}`}
-            className="w-full text-center py-2.5 rounded-xl bg-white/5 hover:bg-white text-sm font-semibold tracking-wide text-white hover:text-black border border-white/20 transition-all duration-300"
+            className="w-full rounded-xl border border-white/20 bg-white/5 py-2.5 text-center text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-black"
           >
             Book Ticket
           </Link>

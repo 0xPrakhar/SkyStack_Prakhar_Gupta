@@ -1,3 +1,5 @@
+const BLOCKED_OBJECT_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 function sanitizeString(value) {
   return value
     .replace(/[<>]/g, "")
@@ -17,7 +19,9 @@ export function sanitizeValue(value) {
 
   if (value && typeof value === "object") {
     return Object.fromEntries(
-      Object.entries(value).map(([key, entry]) => [key, sanitizeValue(entry)]),
+      Object.entries(value)
+        .filter(([key]) => !BLOCKED_OBJECT_KEYS.has(key))
+        .map(([key, entry]) => [key, sanitizeValue(entry)]),
     );
   }
 

@@ -1,11 +1,30 @@
 import axios from "axios";
-import { loadAuthToken } from "./auth-storage";
+import { clearAuthToken, loadAuthToken } from "./auth-storage";
 import type { ApiEnvelope, ApiFieldError } from "../types";
 
-const baseUrl = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
+function resolveApiBaseUrl() {
+  const configuredBaseUrl = import.meta.env.VITE_API_URL?.trim();
+
+  if (configuredBaseUrl) {
+    return configuredBaseUrl.replace(/\/$/, "");
+  }
+
+  if (typeof window !== "undefined") {
+    const { hostname, origin } = window.location;
+    const isLocalHost = hostname === "localhost" || hostname === "127.0.0.1";
+
+    if (isLocalHost) {
+      return "http://127.0.0.1:5000";
+    }
+
+    return origin;
+  }
+
+  return "http://127.0.0.1:5000";
+}
 
 const api = axios.create({
-  baseURL: `${baseUrl.replace(/\/$/, "")}/api`,
+  baseURL: `${resolveApiBaseUrl()}/api`,
   timeout: 15000,
 });
 
@@ -19,11 +38,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      clearAuthToken();
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export function getApiError(
   error: unknown,
   fallbackMessage = "Something went wrong. Please try again.",
 ) {
   if (axios.isAxiosError<ApiEnvelope<unknown>>(error)) {
+    if (!error.response) {
+      return "We could not reach the server. Please check the API URL and try again.";
+    }
+
     const response = error.response?.data;
 
     if (response?.errors?.length) {

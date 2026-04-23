@@ -1,35 +1,6 @@
-export const CITIES = [
-  "New Delhi",
-  "Mumbai",
-  "Bengaluru",
-  "Hyderabad",
-  "Chennai",
-  "Kolkata",
-  "Jaipur",
-  "Lucknow",
-  "Bhopal",
-  "Patna",
-  "Thiruvananthapuram",
-  "Gandhinagar",
-  "Chandigarh",
-  "Bhubaneswar",
-  "Dehradun",
-  "Dispur",
-  "Ranchi",
-  "Raipur",
-  "Amaravati",
-  "Panaji",
-  "Shimla",
-  "Srinagar",
-  "Jammu",
-  "Gangtok",
-  "Agartala",
-  "Aizawl",
-  "Imphal",
-  "Shillong",
-  "Kohima",
-  "Itanagar",
-];
+import { INDIA_CITY_LOCATIONS } from "./lib/india-locations";
+
+export const CITIES = INDIA_CITY_LOCATIONS.map((location) => location.city);
 
 export const CATEGORIES = [
   { id: "all", name: "All Events", icon: "🌐" },
@@ -52,7 +23,7 @@ export const HERO_BANNERS = [
     date: "12 Aug • New Delhi",
     image:
       "https://images.unsplash.com/photo-1639323250828-8dc3d4386661?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZW9uJTIwY29uY2VydCUyMGNyb3dkfGVufDF8fHx8MTc3NTY1MTA0NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    link: "/event/1",
+    link: "/event/evt-neon-nights",
   },
   {
     id: "b2",
@@ -61,7 +32,7 @@ export const HERO_BANNERS = [
     date: "25 Sep • Bengaluru",
     image:
       "https://images.unsplash.com/flagged/photo-1564445477052-8a3787406bbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWNrYXRob24lMjBjb2RpbmclMjBuaWdodHxlbnwxfHx8fDE3NzU2NTEwNDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    link: "/event/2",
+    link: "/event/evt-global-hackathon",
   },
   {
     id: "b3",
@@ -70,7 +41,7 @@ export const HERO_BANNERS = [
     date: "05 Oct • Mumbai",
     image:
       "https://images.unsplash.com/photo-1762537132884-cc6bbde0667a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdGFuZHVwJTIwY29tZWR5JTIwc3RhZ2V8ZW58MXx8fHwxNzc1NjUxMDQ1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    link: "/event/3",
+    link: "/event/evt-laugh-riot",
   },
 ];
 

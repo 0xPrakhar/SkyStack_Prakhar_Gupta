@@ -3,18 +3,38 @@ import { Link } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { HERO_BANNERS } from "../data";
 import { MapPin } from "lucide-react";
+import type { EventRecord } from "../types";
 
-export function HeroCarousel() {
+interface HeroCarouselProps {
+  events?: EventRecord[];
+}
+
+export function HeroCarousel({ events = [] }: HeroCarouselProps) {
   const [index, setIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const slides =
+    events.length > 0
+      ? events.map((event) => ({
+          id: event.id,
+          title: event.title.toUpperCase(),
+          category: event.categoryName,
+          date: `${event.date} - ${event.city}`,
+          image: event.image,
+          link: `/event/${event.id}`,
+        }))
+      : HERO_BANNERS;
 
   useEffect(() => {
     if (isHovered) return;
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % HERO_BANNERS.length);
+      setIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [isHovered]);
+  }, [isHovered, slides.length]);
+
+  useEffect(() => {
+    setIndex(0);
+  }, [slides.length]);
 
   return (
     <div 
@@ -34,8 +54,8 @@ export function HeroCarousel() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img 
-              src={HERO_BANNERS[index].image} 
-              alt={HERO_BANNERS[index].title}
+              src={slides[index].image} 
+              alt={slides[index].title}
               className="w-full h-full object-cover object-center scale-105"
             />
             {/* Grayscale overlays for mono-color aesthetic */}
@@ -53,11 +73,11 @@ export function HeroCarousel() {
               className="flex items-center gap-2 mb-4"
             >
               <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold uppercase tracking-widest">
-                {HERO_BANNERS[index].category}
+                {slides[index].category}
               </div>
               <div className="flex items-center gap-1.5 text-sm text-slate-300 bg-white/5 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                 <MapPin className="w-3.5 h-3.5" />
-                <span>{HERO_BANNERS[index].date}</span>
+                <span>{slides[index].date}</span>
               </div>
             </motion.div>
 
@@ -67,7 +87,7 @@ export function HeroCarousel() {
               transition={{ delay: 0.4 }}
               className="text-4xl md:text-6xl font-black text-white leading-[1.1] mb-6"
             >
-              {HERO_BANNERS[index].title}
+              {slides[index].title}
             </motion.h1>
 
             <motion.div
@@ -76,7 +96,7 @@ export function HeroCarousel() {
               transition={{ delay: 0.5 }}
             >
               <Link 
-                to={HERO_BANNERS[index].link}
+                to={slides[index].link}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-xl font-bold tracking-wide hover:bg-slate-200 transition-all duration-300 transform hover:-translate-y-1"
               >
                 Book Now
@@ -88,7 +108,7 @@ export function HeroCarousel() {
 
       {/* Progress Indicators */}
       <div className="absolute bottom-8 right-8 z-20 flex gap-2">
-        {HERO_BANNERS.map((_, i) => (
+        {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}

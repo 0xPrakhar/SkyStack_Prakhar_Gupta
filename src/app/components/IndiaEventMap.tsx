@@ -1,20 +1,12 @@
-import type { MouseEvent } from "react";
+import { useMemo, type MouseEvent } from "react";
 import { motion } from "motion/react";
 import { Compass, LocateFixed, MapPin, Target } from "lucide-react";
-import type { EventRecord } from "../types";
+import type { EventRecord, MapSelection } from "../types";
 import {
   INDIA_CITY_LOCATIONS,
   projectFromIndiaMap,
   projectToIndiaMap,
 } from "../lib/india-locations";
-
-export interface MapSelection {
-  label: string;
-  lat: number;
-  lng: number;
-  source: "city" | "map" | "geolocation";
-  city?: string;
-}
 
 interface IndiaEventMapProps {
   events: EventRecord[];
@@ -39,22 +31,35 @@ export function IndiaEventMap({
   onReset,
   isLocating,
 }: IndiaEventMapProps) {
-  const eventCountsByCity = events.reduce<Record<string, number>>((counts, event) => {
-    if (selectedCategory !== "all" && event.categoryId !== selectedCategory) {
-      return counts;
-    }
+  const eventCountsByCity = useMemo(
+    () =>
+      events.reduce<Record<string, number>>((counts, event) => {
+        if (selectedCategory !== "all" && event.categoryId !== selectedCategory) {
+          return counts;
+        }
 
-    counts[event.city] = (counts[event.city] ?? 0) + 1;
-    return counts;
-  }, {});
-
-  const mappedCities = INDIA_CITY_LOCATIONS.filter(
-    (location) => (eventCountsByCity[location.city] ?? 0) > 0,
+        counts[event.city] = (counts[event.city] ?? 0) + 1;
+        return counts;
+      }, {}),
+    [events, selectedCategory],
   );
-  const selectedProjection = selectedLocation
-    ? projectToIndiaMap(selectedLocation.lat, selectedLocation.lng)
-    : null;
-  const mapConnections = buildMapConnections(mappedCities);
+
+  const mappedCities = useMemo(
+    () =>
+      INDIA_CITY_LOCATIONS.filter((location) => (eventCountsByCity[location.city] ?? 0) > 0),
+    [eventCountsByCity],
+  );
+  const selectedProjection = useMemo(
+    () =>
+      selectedLocation
+        ? projectToIndiaMap(selectedLocation.lat, selectedLocation.lng)
+        : null,
+    [selectedLocation],
+  );
+  const mapConnections = useMemo(
+    () => buildMapConnections(mappedCities),
+    [mappedCities],
+  );
 
   function handleMapClick(event: MouseEvent<SVGSVGElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -128,7 +133,7 @@ export function IndiaEventMap({
 
           <svg
             viewBox="0 0 100 100"
-            className="relative z-10 h-full w-full"
+            className="relative z-10 h-full w-full cursor-crosshair"
             onClick={handleMapClick}
             role="presentation"
           >
@@ -203,6 +208,17 @@ export function IndiaEventMap({
               );
             })}
           </svg>
+
+          {mappedCities.length === 0 && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center px-6 text-center">
+              <div className="max-w-sm rounded-[1.5rem] border border-dashed border-white/15 bg-[#120d37]/90 px-5 py-6">
+                <p className="text-sm font-semibold text-white">No map results yet</p>
+                <p className="mt-2 text-sm text-slate-400">
+                  Adjust the search or category filters to bring cities back onto the map.
+                </p>
+              </div>
+            </div>
+          )}
 
           {mappedCities.map((location) => {
             const projection = projectToIndiaMap(location.lat, location.lng);

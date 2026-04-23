@@ -1,30 +1,103 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { motion } from "motion/react";
-import { Plus, Users, Ticket, IndianRupee, MoreVertical, Edit2, Trash2 } from "lucide-react";
-import { EVENTS } from "../data";
+import { Edit2, Plus, Ticket, Trash2, Users, WalletCards } from "lucide-react";
+import api, { getApiError } from "../lib/api";
+import { useEvents } from "../context/EventsContext";
+import { formatPrice } from "../lib/formatters";
+import type { ApiEnvelope, EventBooking, EventRecord } from "../types";
+
+interface AdminOverview {
+  stats: {
+    totalRevenue: number;
+    ticketsSold: number;
+    activeEvents: number;
+    registeredUsers: number;
+  };
+  recentBookings: EventBooking[];
+  events: EventRecord[];
+}
 
 export function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [overview, setOverview] = useState<AdminOverview | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { deleteEvent, refreshEvents } = useEvents();
 
-  const stats = [
-    { label: "Total Revenue", value: "₹2,45,000", icon: IndianRupee },
-    { label: "Tickets Sold", value: "842", icon: Ticket },
-    { label: "Active Events", value: EVENTS.length.toString(), icon: Users },
-  ];
+  async function loadOverview() {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await api.get<ApiEnvelope<AdminOverview>>("/admin/overview");
+      setOverview(response.data.data);
+    } catch (loadError) {
+      setError(getApiError(loadError, "Unable to load admin panel right now."));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadOverview();
+  }, []);
+
+  async function handleDelete(eventId: string) {
+    if (!window.confirm("Delete this event from the platform?")) {
+      return;
+    }
+
+    try {
+      await deleteEvent(eventId);
+      await Promise.all([refreshEvents(), loadOverview()]);
+    } catch (deleteError) {
+      setError(getApiError(deleteError, "Unable to delete this event."));
+    }
+  }
+
+  const stats = overview
+    ? [
+        {
+          label: "Total Revenue",
+          value: formatPrice(overview.stats.totalRevenue),
+          icon: WalletCards,
+        },
+        {
+          label: "Tickets Sold",
+          value: String(overview.stats.ticketsSold),
+          icon: Ticket,
+        },
+        {
+          label: "Active Events",
+          value: String(overview.stats.activeEvents),
+          icon: Users,
+        },
+        {
+          label: "Registered Users",
+          value: String(overview.stats.registeredUsers),
+          icon: Users,
+        },
+      ]
+    : [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Admin Panel</h1>
-          <p className="text-slate-400">Manage your events and track performance.</p>
+          <p className="text-slate-400">
+            Manage platform events, bookings, and revenue.
+          </p>
         </div>
-        <button className="flex items-center gap-2 bg-white text-black px-5 py-2.5 rounded-full font-semibold hover:bg-slate-200 transition-colors">
+        <Link
+          to="/my-events"
+          className="flex items-center gap-2 bg-white text-black px-5 py-2.5 rounded-full font-semibold hover:bg-slate-200 transition-colors"
+        >
           <Plus className="w-5 h-5" /> Create Event
-        </button>
+        </Link>
       </div>
 
-      {/* Tabs */}
       <div className="flex items-center gap-4 border-b border-white/10 mb-8">
         {["dashboard", "events"].map((tab) => (
           <button
@@ -36,7 +109,7 @@ export function Admin() {
           >
             {tab}
             {activeTab === tab && (
-              <motion.div 
+              <motion.div
                 layoutId="admin-tab"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
               />
@@ -45,11 +118,26 @@ export function Admin() {
         ))}
       </div>
 
-      {activeTab === "dashboard" ? (
+      {isLoading && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-slate-400">
+          Loading admin data...
+        </div>
+      )}
+
+      {!isLoading && error && (
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-red-100">
+          <p>{error}</p>
+          <button onClick={loadOverview} className="mt-4 text-white underline">
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!isLoading && !error && overview && activeTab === "dashboard" && (
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {stats.map((stat, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 p-6 rounded-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {stats.map((stat) => (
+              <div key={stat.label} className="bg-white/5 border border-white/10 p-6 rounded-2xl">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-slate-400 font-medium">{stat.label}</span>
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
@@ -67,7 +155,7 @@ export function Admin() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="text-slate-400 border-b border-white/10">
-                    <th className="pb-4 font-medium">Order ID</th>
+                    <th className="pb-4 font-medium">Booking ID</th>
                     <th className="pb-4 font-medium">Event</th>
                     <th className="pb-4 font-medium">Customer</th>
                     <th className="pb-4 font-medium">Tickets</th>
@@ -75,13 +163,24 @@ export function Admin() {
                   </tr>
                 </thead>
                 <tbody className="text-slate-300 divide-y divide-white/5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <tr key={i} className="hover:bg-white/[0.02]">
-                      <td className="py-4">#{Math.random().toString(36).substring(2,8).toUpperCase()}</td>
-                      <td className="py-4 truncate max-w-[200px]">{EVENTS[i%EVENTS.length].title}</td>
-                      <td className="py-4">user{i}@example.com</td>
-                      <td className="py-4">{Math.floor(Math.random() * 4) + 1}</td>
-                      <td className="py-4 font-medium text-white">₹{EVENTS[i%EVENTS.length].price * 2}</td>
+                  {overview.recentBookings.length === 0 && (
+                    <tr>
+                      <td className="py-6 text-slate-500" colSpan={5}>
+                        No bookings yet.
+                      </td>
+                    </tr>
+                  )}
+                  {overview.recentBookings.map((booking) => (
+                    <tr key={booking.id} className="hover:bg-white/[0.02]">
+                      <td className="py-4 font-mono">{booking.bookingCode}</td>
+                      <td className="py-4 truncate max-w-[220px]">
+                        {booking.eventTitle}
+                      </td>
+                      <td className="py-4">{booking.userEmail}</td>
+                      <td className="py-4">{booking.ticketCount}</td>
+                      <td className="py-4 font-medium text-white">
+                        {formatPrice(booking.totalAmount)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -89,7 +188,9 @@ export function Admin() {
             </div>
           </div>
         </div>
-      ) : (
+      )}
+
+      {!isLoading && !error && overview && activeTab === "events" && (
         <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead>
@@ -101,14 +202,20 @@ export function Admin() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-slate-300">
-              {EVENTS.map((event) => (
+              {overview.events.map((event) => (
                 <tr key={event.id} className="hover:bg-white/[0.02]">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <img src={event.image} alt="" className="w-12 h-12 rounded-lg object-cover bg-white/10" />
+                      <img
+                        src={event.image}
+                        alt=""
+                        className="w-12 h-12 rounded-lg object-cover bg-white/10"
+                      />
                       <div>
                         <div className="font-bold text-white">{event.title}</div>
-                        <div className="text-xs text-slate-500">{event.categoryName}</div>
+                        <div className="text-xs text-slate-500">
+                          {event.categoryName}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -116,13 +223,21 @@ export function Admin() {
                     <div>{event.date}</div>
                     <div className="text-slate-500 text-xs">{event.city}</div>
                   </td>
-                  <td className="p-4 font-medium">₹{event.price}</td>
+                  <td className="p-4 font-medium">{formatPrice(event.price)}</td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white">
+                      <Link
+                        to={`/my-events?edit=${encodeURIComponent(event.id)}`}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white"
+                        aria-label={`Edit ${event.title}`}
+                      >
                         <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-red-400">
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(event.id)}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-red-400"
+                        aria-label={`Delete ${event.title}`}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>

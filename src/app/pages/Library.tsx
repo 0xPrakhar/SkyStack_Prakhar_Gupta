@@ -41,9 +41,7 @@ export function Library() {
           <LibraryStat label="Recent" value={String(recentEvents.length)} />
         </div>
         <p className="mt-5 text-sm text-slate-400">
-          {isAuthenticated && user
-            ? `Signed in as ${user.name}.`
-            : "You can browse as a guest, but sign in if you want this tied to your account."}
+          {isAuthenticated && user ? `Signed in as ${user.name}.` : ""}
         </p>
       </section>
 

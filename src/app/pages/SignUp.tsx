@@ -1,27 +1,52 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { motion } from "motion/react";
 import { Ticket, Mail, Lock, User, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationsContext";
 import { getApiError } from "../lib/api";
 
 export function SignUp() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { isAuthenticated, signUp, user } = useAuth();
+  const { pushNotification } = useNotifications();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const redirectTo = searchParams.get("redirect");
+  const passwordChecks = getPasswordChecks(password);
+  const passwordError = getPasswordError(passwordChecks);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(redirectTo || (user.role === "admin" ? "/admin" : "/"), {
+        replace: true,
+      });
+    }
+  }, [isAuthenticated, navigate, redirectTo, user]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      await signUp({ name, email, password });
-      navigate("/");
+      const signedUpUser = await signUp({ name, email, password });
+      pushNotification({
+        title: "Account ready",
+        body: `Welcome to Eventify, ${signedUpUser.name}.`,
+        href: redirectTo || "/library",
+      });
+      navigate(redirectTo || "/", { replace: true });
     } catch (submitError) {
       setError(getApiError(submitError, "Unable to create your account right now."));
     } finally {
@@ -61,6 +86,8 @@ export function SignUp() {
               type="text" 
               value={name}
               onChange={(event) => setName(event.target.value)}
+              autoComplete="name"
+              required
               placeholder="Full Name" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
@@ -72,6 +99,9 @@ export function SignUp() {
               type="email" 
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              inputMode="email"
+              required
               placeholder="Email address" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
@@ -83,9 +113,27 @@ export function SignUp() {
               type="password" 
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+              required
               placeholder="Password" 
               className="w-full bg-black border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none focus:border-white focus:bg-white/5 transition-all"
             />
+          </div>
+
+          <div className="-mt-1 rounded-2xl border border-white/10 bg-black/40 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Password rules
+            </p>
+            <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+              {passwordChecks.map((check) => (
+                <div
+                  key={check.label}
+                  className={check.valid ? "text-emerald-300" : "text-slate-500"}
+                >
+                  {check.valid ? "OK" : "NO"} {check.label}
+                </div>
+              ))}
+            </div>
           </div>
 
           {error && (
@@ -105,10 +153,53 @@ export function SignUp() {
         </form>
 
         <p className="mt-8 text-sm text-slate-400 font-medium">
-          Already have an account? <Link to="/signin" className="text-white font-bold hover:underline">Sign In</Link>
+          Already have an account?{" "}
+          <Link
+            to={redirectTo ? `/signin?redirect=${encodeURIComponent(redirectTo)}` : "/signin"}
+            className="text-white font-bold hover:underline"
+          >
+            Sign In
+          </Link>
         </p>
 
       </motion.div>
     </div>
   );
+}
+
+function getPasswordChecks(password: string) {
+  return [
+    {
+      label: "8 to 64 characters",
+      valid: password.length >= 8 && password.length <= 64,
+    },
+    {
+      label: "One uppercase letter",
+      valid: /[A-Z]/.test(password),
+    },
+    {
+      label: "One lowercase letter",
+      valid: /[a-z]/.test(password),
+    },
+    {
+      label: "One number",
+      valid: /\d/.test(password),
+    },
+    {
+      label: "No spaces",
+      valid: !/\s/.test(password),
+    },
+  ];
+}
+
+function getPasswordError(
+  checks: Array<{ label: string; valid: boolean }>,
+) {
+  const failedChecks = checks.filter((check) => !check.valid).map((check) => check.label);
+
+  if (failedChecks.length === 0) {
+    return "";
+  }
+
+  return `Password needs: ${failedChecks.join(", ")}.`;
 }

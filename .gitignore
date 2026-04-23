@@ -4,13 +4,7 @@ dist/
 server/.env
 coverage/
 .DS_Store
-<<<<<<< HEAD
-<<<<<<< HEAD
 .npm-cache/
 *.log
 server/data/
 *.lnk
-=======
->>>>>>> e91372e (initial commit)
-=======
->>>>>>> e91372e (initial commit)

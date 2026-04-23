@@ -330,6 +330,7 @@ export function buildSeedStore() {
       createdAt: timestamp,
       updatedAt: timestamp,
     })),
+    bookings: [],
     meta: {
       initializedAt: timestamp,
       version: 4,

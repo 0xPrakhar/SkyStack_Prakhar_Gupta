@@ -6,8 +6,8 @@ import { initializeDataStore } from "./services/data-store.js";
 
 async function startServer() {
   try {
-    await initializeDataStore();
     await connectDatabase();
+    await initializeDataStore();
     await ensureAdminUser();
 
     app.listen(env.port, () => {

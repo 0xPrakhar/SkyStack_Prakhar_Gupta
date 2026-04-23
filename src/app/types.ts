@@ -21,6 +21,9 @@ export interface EventRating {
 
 export interface EventBooking {
   id: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
   eventId: string;
   eventTitle: string;
   eventImage: string;
@@ -32,6 +35,20 @@ export interface EventBooking {
   totalAmount: number;
   bookedAt: string;
   bookingCode: string;
+}
+
+export interface EventFilters {
+  search?: string;
+  city?: string;
+  categoryId?: string;
+}
+
+export interface MapSelection {
+  label: string;
+  lat: number;
+  lng: number;
+  source: "city" | "map" | "geolocation";
+  city?: string;
 }
 
 export interface EventRecord {
@@ -82,4 +99,23 @@ export interface ApiEnvelope<T> {
   message?: string;
   data: T;
   errors?: ApiFieldError[];
+}
+
+export interface EventWeather {
+  provider: string;
+  current: {
+    temperatureC?: number;
+    humidityPercent?: number;
+    precipitationMm?: number;
+    windSpeedKmh?: number;
+    summary: string;
+    observedAt?: string;
+  };
+  daily: Array<{
+    date: string;
+    minTemperatureC?: number;
+    maxTemperatureC?: number;
+    precipitationProbabilityPercent?: number;
+    summary: string;
+  }>;
 }

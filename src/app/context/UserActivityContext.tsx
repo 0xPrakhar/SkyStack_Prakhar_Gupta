@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import type { EventBooking, EventRecord } from "../types";
+import { useNotifications } from "./NotificationsContext";
+import api from "../lib/api";
+import type { ApiEnvelope, EventBooking, EventRecord } from "../types";
 
 interface UserActivityState {
   favorites: string[];
@@ -13,13 +15,12 @@ interface UserActivityContextValue extends UserActivityState {
   isFavorite: (eventId: string) => boolean;
   toggleFavorite: (event: EventRecord | string) => boolean;
   addRecentView: (eventId: string) => void;
-  createBooking: (event: EventRecord, ticketCount: number) => EventBooking;
+  createBooking: (event: EventRecord, ticketCount: number) => Promise<EventBooking>;
   clearRecentViews: () => void;
 }
 
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 const MAX_RECENT_EVENTS = 8;
-const MAX_BOOKINGS = 12;
 const defaultState: UserActivityState = {
   favorites: [],
   recentEventIds: [],
@@ -32,19 +33,24 @@ const UserActivityContext = createContext<UserActivityContextValue | undefined>(
 
 export function UserActivityProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { pushNotification } = useNotifications();
   const storageKey = `eventify:activity:${user?.id ?? "guest"}`;
   const [activity, setActivity] = useState<UserActivityState>(defaultState);
+  const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
 
+    setLoadedStorageKey(null);
+
     try {
       const rawState = window.localStorage.getItem(storageKey);
 
       if (!rawState) {
         setActivity(defaultState);
+        setLoadedStorageKey(storageKey);
         return;
       }
 
@@ -54,15 +60,17 @@ export function UserActivityProvider({ children }: { children: ReactNode }) {
         recentEventIds: Array.isArray(parsedState.recentEventIds)
           ? parsedState.recentEventIds
           : [],
-        bookings: Array.isArray(parsedState.bookings) ? parsedState.bookings : [],
+        bookings: [],
       });
+      setLoadedStorageKey(storageKey);
     } catch (_error) {
       setActivity(defaultState);
+      setLoadedStorageKey(storageKey);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || loadedStorageKey !== storageKey) {
       return;
     }
 
@@ -70,10 +78,51 @@ export function UserActivityProvider({ children }: { children: ReactNode }) {
       storageKey,
       JSON.stringify({
         version: STORAGE_VERSION,
-        ...activity,
+        favorites: activity.favorites,
+        recentEventIds: activity.recentEventIds,
       }),
     );
-  }, [activity, storageKey]);
+  }, [activity.favorites, activity.recentEventIds, loadedStorageKey, storageKey]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadBookings() {
+      if (!user) {
+        setActivity((currentActivity) => ({
+          ...currentActivity,
+          bookings: [],
+        }));
+        return;
+      }
+
+      try {
+        const response = await api.get<ApiEnvelope<{ bookings: EventBooking[] }>>(
+          "/bookings/me",
+        );
+
+        if (isMounted) {
+          setActivity((currentActivity) => ({
+            ...currentActivity,
+            bookings: response.data.data.bookings,
+          }));
+        }
+      } catch (_error) {
+        if (isMounted) {
+          setActivity((currentActivity) => ({
+            ...currentActivity,
+            bookings: [],
+          }));
+        }
+      }
+    }
+
+    loadBookings();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   function isFavorite(eventId: string) {
     return activity.favorites.includes(eventId);
@@ -95,6 +144,16 @@ export function UserActivityProvider({ children }: { children: ReactNode }) {
       };
     });
 
+    if (typeof event !== "string") {
+      pushNotification({
+        title: nextIsFavorite ? "Saved to library" : "Removed from saved events",
+        body: nextIsFavorite
+          ? `${event.title} is waiting for you in your library.`
+          : `${event.title} was removed from your saved list.`,
+        href: nextIsFavorite ? "/library" : undefined,
+      });
+    }
+
     return nextIsFavorite;
   }
 
@@ -108,26 +167,32 @@ export function UserActivityProvider({ children }: { children: ReactNode }) {
     }));
   }
 
-  function createBooking(event: EventRecord, ticketCount: number) {
-    const booking: EventBooking = {
-      id: crypto.randomUUID(),
-      eventId: event.id,
-      eventTitle: event.title,
-      eventImage: event.image,
-      city: event.city,
-      venue: event.venue,
-      date: event.date,
-      time: event.time,
-      ticketCount,
-      totalAmount: event.price * ticketCount,
-      bookedAt: new Date().toISOString(),
-      bookingCode: `EV-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-    };
+  async function createBooking(event: EventRecord, ticketCount: number) {
+    if (!user) {
+      throw new Error("Sign in to book tickets.");
+    }
+
+    const response = await api.post<ApiEnvelope<{ booking: EventBooking }>>(
+      "/bookings",
+      {
+        eventId: event.id,
+        ticketCount,
+      },
+    );
+    const booking = response.data.data.booking;
 
     setActivity((currentActivity) => ({
       ...currentActivity,
-      bookings: [booking, ...currentActivity.bookings].slice(0, MAX_BOOKINGS),
+      bookings: [
+        booking,
+        ...currentActivity.bookings.filter((entry) => entry.id !== booking.id),
+      ],
     }));
+    pushNotification({
+      title: "Booking confirmed",
+      body: `${booking.ticketCount} ticket(s) booked for ${booking.eventTitle}.`,
+      href: "/library",
+    });
 
     return booking;
   }

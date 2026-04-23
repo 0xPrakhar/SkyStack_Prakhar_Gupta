@@ -59,14 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signIn(payload: SignInPayload) {
-    const response = await api.post<ApiEnvelope<AuthResponse>>("/auth/login", payload);
+    const response = await api.post<ApiEnvelope<AuthResponse>>("/auth/login", {
+      ...payload,
+      email: payload.email.trim().toLowerCase(),
+    });
     applyAuth(response.data.data);
 
     return response.data.data.user;
   }
 
   async function signUp(payload: SignUpPayload) {
-    const response = await api.post<ApiEnvelope<AuthResponse>>("/auth/register", payload);
+    const response = await api.post<ApiEnvelope<AuthResponse>>("/auth/register", {
+      ...payload,
+      name: payload.name.trim(),
+      email: payload.email.trim().toLowerCase(),
+    });
     applyAuth(response.data.data);
 
     return response.data.data.user;

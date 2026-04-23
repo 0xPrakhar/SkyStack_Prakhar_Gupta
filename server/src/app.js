@@ -8,6 +8,7 @@ import { errorHandler } from "./middlewares/error-handler.js";
 import { notFoundHandler } from "./middlewares/not-found.js";
 import { sanitizeRequest } from "./middlewares/sanitize-request.js";
 import apiRoutes from "./routes/index.js";
+import { HttpError } from "./utils/http-error.js";
 
 const app = express();
 const allowedOrigins = new Set(env.clientUrls);
@@ -22,6 +23,8 @@ const apiLimiter = rateLimit({
   },
 });
 
+app.set("trust proxy", env.isProduction ? 1 : 0);
+
 app.use(
   cors({
     origin(origin, callback) {
@@ -30,9 +33,9 @@ app.use(
         return;
       }
 
-      callback(new Error("Origin not allowed."));
+      callback(new HttpError(403, "Origin not allowed."));
     },
-    credentials: true,
+    credentials: false,
   }),
 );
 app.disable("x-powered-by");
