@@ -25,7 +25,7 @@ function resolveApiBaseUrl() {
 
 const api = axios.create({
   baseURL: `${resolveApiBaseUrl()}/api`,
-  timeout: 15000,
+  timeout: 45000,
 });
 
 api.interceptors.request.use((config) => {
@@ -54,8 +54,12 @@ export function getApiError(
   fallbackMessage = "Something went wrong. Please try again.",
 ) {
   if (axios.isAxiosError<ApiEnvelope<unknown>>(error)) {
+    if (error.code === "ECONNABORTED") {
+      return "The server is taking longer than expected to respond. If this is the first request, Render may be waking it up. Please try again in a few seconds.";
+    }
+
     if (!error.response) {
-      return "We could not reach the server. Please check the API URL and try again.";
+      return "We could not reach the server. Please check the API URL, then try again. If the backend is on Render free tier, wait a few seconds for it to wake up.";
     }
 
     const response = error.response?.data;
