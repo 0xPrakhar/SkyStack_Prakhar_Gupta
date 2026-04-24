@@ -7,33 +7,48 @@
 
 ### Backend (Web Service)
 
-Root Directory: ``` server ``` 
+Root Directory: 
+```powershell
+server
+``` 
 
-Build Command: ``` npm install ```
+Build Command: 
+```powershell
+npm install
+ ```
 
-Start Command: ``` npm start ```
+Start Command:
+```powershell 
+npm start
+ ```
 
 ### Frontend (Static Site)
 
 Root Directory: . 
 
-Build Command: ``` npm install && npm run build ```
+Build Command: 
+```powershell 
+npm install && npm run build
+ ```
 
-Publish Directory: ``` dist ```
+Publish Directory:
+```powershell  
+dist
+ ```
 
 ### There is no start command for a static site.
 
 
 ### backend build
-```
+```powershell
 npm install
 ```
 ## backend start
-```
+```powershell
 npm start
 ```
 ## frontend start
-```
+```powershell
 npm install && npm run build
 
 ```
