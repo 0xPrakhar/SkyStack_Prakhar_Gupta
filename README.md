@@ -1,25 +1,30 @@
-## deployment 
+# deployment 
 
 
-# Use these on Render.
+## Use these on Render.
 
 
 
-## Backend (Web Service)
+### Backend (Web Service)
 
-Root Directory: ``` server ```
+Root Directory: ``` server ``` 
+
 Build Command: ``` npm install ```
+
 Start Command: ``` npm start ```
 
-## Frontend (Static Site)
+### Frontend (Static Site)
 
-Root Directory: .
+Root Directory: . 
+
 Build Command: ``` npm install && npm run build ```
+
 Publish Directory: ``` dist ```
-# There is no start command for a static site.
+
+### There is no start command for a static site.
 
 
-## backend build
+### backend build
 ```
 npm install
 ```
