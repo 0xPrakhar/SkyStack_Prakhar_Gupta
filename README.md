@@ -47,7 +47,7 @@ dist
 
 ```powershell
 NODE_ENV=production
-CLIENT_URLS=https://eventify-kkzb.onrender.com
+CLIENT_URLS=https://skystack-prakhar-gupta-1.onrender.com,https://eventify-kkzb.onrender.com
 JWT_SECRET=replace-with-a-long-random-secret
 JWT_EXPIRES_IN=7d
 DEFAULT_ADMIN_EMAIL=admin@eventify.local
