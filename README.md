@@ -24,7 +24,10 @@ npm start
 
 ### Frontend (Static Site)
 
-Root Directory: . 
+Root Directory: 
+```powershell
+ . 
+```
 
 Build Command: 
 ```powershell 
@@ -38,22 +41,10 @@ dist
 
 ### There is no start command for a static site.
 
+# environment
 
-### backend build
-```powershell
-npm install
-```
-## backend start
-```powershell
-npm start
-```
-## frontend start
-```powershell
-npm install && npm run build
-
-```
-## environment
 ## backend
+
 ```powershell
 NODE_ENV=production
 CLIENT_URLS=https://eventify-kkzb.onrender.com
