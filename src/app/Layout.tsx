@@ -93,7 +93,7 @@ export function Layout() {
               <Ticket className="w-5 h-5 text-black" />
             </div>
             <span className="text-xl font-black tracking-widest text-white">
-              EVENTIFY
+              DELULU
             </span>
           </Link>
 
@@ -376,7 +376,7 @@ export function Layout() {
       {/* Simple Footer */}
       {!isAuthPage && (
         <footer className="border-t border-white/10 mt-20 py-8 text-center text-slate-500 text-sm relative z-10 bg-black">
-          <p>© 2026 EVENTIFY. All rights reserved.</p>
+          <p>© 2026 DELULU. All rights reserved.</p>
         </footer>
       )}
     </div>
