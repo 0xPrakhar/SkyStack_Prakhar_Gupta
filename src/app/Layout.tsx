@@ -93,7 +93,7 @@ export function Layout() {
               <Ticket className="w-5 h-5 text-black" />
             </div>
             <span className="text-xl font-black tracking-widest text-white">
-              DELULU
+              EVENTIFY
             </span>
           </Link>
 
